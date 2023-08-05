@@ -23,6 +23,7 @@ public class InventoryService
 	@SneakyThrows
 	public List<InventoryResponse> isInStock(List<String> skuCode) throws InterruptedException {
 		log.info("Wait started....");
+		//To test Circuit breaker - Retry
 		Thread.sleep(10000);
 		log.info("Wait ended....");
 		return inventoryRepository.findBySkuCodeIn(skuCode).stream().map(inventory ->
