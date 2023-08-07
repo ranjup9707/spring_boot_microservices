@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.microservices.order.dto.InventoryResponse;
 import com.microservices.order.dto.OrderLineItemsDto;
 import com.microservices.order.dto.OrderRequest;
+import com.microservices.order.event.OrderBasedEvent;
 import com.microservices.order.model.Order;
 import com.microservices.order.model.OrderLineItems;
 import com.microservices.order.repository.OrderRepository;
@@ -25,6 +27,9 @@ public class OrderService
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
+	
+	@Autowired
+	private KafkaTemplate<String, OrderBasedEvent> kafkaTemplate;
 
 	public String placeOrder(OrderRequest orderRequest) throws IllegalAccessException {
 		Order order = new Order();
@@ -50,6 +55,7 @@ public class OrderService
 		if(allProductInStock)
 		{
 			orderRepository.save(order);
+			kafkaTemplate.send("notificationTopic", new OrderBasedEvent(order.getOrderNo()));
 			return "Order placed successfully.";
 		}
 		else

@@ -26,6 +26,8 @@
 		<module>microservices-inventory-service</module>
 		<module>discovery-server</module>
 		<module>api-gateway</module>
+		<module>notification-service</module>
+		<module>microservices-notification-service</module>
 	</modules>
 
 	<dependencies>
